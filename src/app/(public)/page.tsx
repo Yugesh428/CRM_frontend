@@ -6,6 +6,7 @@ import TestimonialsSection from "@/components/Uicomponents/Testimonial/Testimoni
 import AccreditationSection from "@/components/Uicomponents/AccreditationSection/AccreditationSection";
 import EventsSection from "@/components/Uicomponents/EventCard/EventSections";
 import VideoChroniclesSection from "@/components/Uicomponents/Vedio/VedioChroniclesSection";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">

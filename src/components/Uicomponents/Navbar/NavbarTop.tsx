@@ -1,6 +1,7 @@
 "use client";
 
-import { BadgeCheck, MapPin, ChevronDown, Phone } from "lucide-react";
+import Link from "next/link";
+import { BadgeCheck, MapPin, ChevronDown, Phone, ShieldCheck } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +25,7 @@ export default function NavbarTop() {
           <span>Global Offices: Kathmandu • Pokhara • Sydney • London</span>
         </div>
 
-        {/* Right: Currency & Phone */}
+        {/* Right: Currency, Phone & Admin Login */}
         <div className="flex items-center gap-4">
           {/* Shadcn Dropdown for Currency */}
           <DropdownMenu>
@@ -44,6 +45,15 @@ export default function NavbarTop() {
             <Phone className="w-3.5 h-3.5" />
             <span>+1 (800) 995-ZYLO</span>
           </div>
+
+          {/* Admin Login Link */}
+          <Link
+            href="/admin/login"
+            className="flex items-center gap-1 text-slate-600 hover:text-[#1e3a8a] transition-colors font-medium"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Admin</span>
+          </Link>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, MessageCircle, Menu } from "lucide-react";
+import { GraduationCap, MessageCircle, Menu, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -127,6 +127,14 @@ export default function NavbarMain() {
                     className="px-5 py-2 bg-green-700 text-white text-center rounded-lg text-sm font-medium"
                   >
                     Book Free Consultation
+                  </Link>
+                  <Link
+                    href="/admin/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin Login
                   </Link>
                 </div>
               </div>
