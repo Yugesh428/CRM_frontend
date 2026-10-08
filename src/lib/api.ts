@@ -243,64 +243,8 @@ export async function deleteTeacher(id: string | number): Promise<ApiResponse> {
 }
 
 // ==========================================
-// APPLICATIONS
+// APPLICATIONS - placeholder, full interface & functions defined below
 // ==========================================
-
-export async function getApplicationDashboard(): Promise<ApiResponse<any>> {
-  const res = await fetch(`${API_BASE}/api/applications/dashboard`, {
-    headers: getAuthHeaders(),
-  });
-  return res.json();
-}
-
-export async function getAllApplications(params?: {
-  status?: string;
-  page?: number;
-  limit?: number;
-}): Promise<ApiResponse<any>> {
-  const query = new URLSearchParams();
-  if (params?.status) query.append("status", params.status);
-  if (params?.page) query.append("page", params.page.toString());
-  if (params?.limit) query.append("limit", params.limit.toString());
-
-  const res = await fetch(`${API_BASE}/api/applications?${query}`, {
-    headers: getAuthHeaders(),
-  });
-  return res.json();
-}
-
-export async function getApplicationById(id: string): Promise<ApiResponse<any>> {
-  const res = await fetch(`${API_BASE}/api/applications/${id}`, {
-    headers: getAuthHeaders(),
-  });
-  return res.json();
-}
-
-export async function createApplication(payload: any): Promise<ApiResponse<any>> {
-  const res = await fetch(`${API_BASE}/api/applications`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
-  return res.json();
-}
-
-export async function updateApplication(id: string, payload: any): Promise<ApiResponse<any>> {
-  const res = await fetch(`${API_BASE}/api/applications/${id}`, {
-    method: "PUT",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  });
-  return res.json();
-}
-
-export async function deleteApplication(id: string): Promise<ApiResponse> {
-  const res = await fetch(`${API_BASE}/api/applications/${id}`, {
-    method: "DELETE",
-    headers: getAuthHeaders(),
-  });
-  return res.json();
-}
 
 // ==========================================
 // VISA MANAGEMENT
@@ -2099,4 +2043,584 @@ export async function resetStaffPassword(id: string): Promise<ApiResponse<{ emai
     headers: getAuthHeaders(),
   });
   return res.json();
+}
+
+
+// ========================================
+// COURSE REQUIREMENTS API
+// ========================================
+
+export interface CourseRequirement {
+  id: string;
+  courseId: string;
+  universityId: string;
+  intakeId?: string | null;
+  applicableCountry?: string | null;
+  studyLevel?: string;
+  // Academic
+  minimumGPA?: number;
+  minimumPercentage?: number;
+  minimumQualification?: string;
+  academicRequirementNotes?: string;
+  requiredSubjects?: string[];
+  subjectNotes?: string;
+  // IELTS
+  ieltsOverall?: number;
+  ieltsListening?: number;
+  ieltsReading?: number;
+  ieltsWriting?: number;
+  ieltsSpeaking?: number;
+  // PTE
+  pteOverall?: number;
+  pteListening?: number;
+  pteReading?: number;
+  pteWriting?: number;
+  pteSpeaking?: number;
+  // TOEFL
+  toeflTotal?: number;
+  toeflListening?: number;
+  toeflReading?: number;
+  toeflWriting?: number;
+  toeflSpeaking?: number;
+  // Other tests
+  duolingoScore?: number;
+  satTotal?: number;
+  actScore?: number;
+  greTotal?: number;
+  gmatTotal?: number;
+  englishRequirementNotes?: string;
+  moiAccepted?: boolean;
+  englishWaiverAvailable?: boolean;
+  // Work experience
+  workExperienceRequired?: boolean;
+  workExperienceYears?: number;
+  workExperienceDetails?: string;
+  // Study gap
+  studyGapPolicy?: string;
+  studyGapNotes?: string;
+  // Documents
+  requiredDocuments?: string[];
+  documentNotes?: string;
+  // Additional
+  additionalRequirements?: string;
+  scholarshipRequirements?: string;
+  interviewRequired?: string;
+  portfolioRequired?: string;
+  countrySpecificNotes?: string;
+  status?: string;
+  organizationId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Relations
+  course?: Course;
+  university?: University;
+  intake?: Intake;
+}
+
+export async function getAllCourseRequirements(params?: {
+  courseId?: string;
+  universityId?: string;
+  intakeId?: string;
+  country?: string;
+  studyLevel?: string;
+  status?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<ApiResponse<CourseRequirement[]>> {
+  const query = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        query.append(key, String(value));
+      }
+    });
+  }
+  const res = await fetch(`${API_BASE}/api/course-requirements?${query}`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function getCourseRequirementById(id: string): Promise<ApiResponse<CourseRequirement>> {
+  const res = await fetch(`${API_BASE}/api/course-requirements/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function getRequirementsByCourse(
+  courseId: string,
+  params?: { country?: string; intakeId?: string }
+): Promise<ApiResponse<any>> {
+  const query = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) query.append(key, value);
+    });
+  }
+  const res = await fetch(`${API_BASE}/api/course-requirements/course/${courseId}?${query}`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function createCourseRequirement(data: Partial<CourseRequirement>): Promise<ApiResponse<CourseRequirement>> {
+  const res = await fetch(`${API_BASE}/api/course-requirements`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function updateCourseRequirement(id: string, data: Partial<CourseRequirement>): Promise<ApiResponse<CourseRequirement>> {
+  const res = await fetch(`${API_BASE}/api/course-requirements/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function deleteCourseRequirement(id: string): Promise<ApiResponse<void>> {
+  const res = await fetch(`${API_BASE}/api/course-requirements/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function copyCourseRequirement(id: string, targetIntakeId: string): Promise<ApiResponse<CourseRequirement>> {
+  const res = await fetch(`${API_BASE}/api/course-requirements/${id}/copy`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ targetIntakeId }),
+  });
+  return res.json();
+}
+
+// ==========================================
+// APPLICATIONS
+// ==========================================
+export interface Application {
+  id: string;
+  applicationNumber: string;
+  
+  // Student Reference
+  studentId: string;
+  
+  // University & Course Selection
+  universityId: string;
+  campusId?: string | null;
+  courseId: string;
+  intakeId: string;
+  
+  // Application Details
+  applicationType?: "new_application" | "transfer" | "re_application" | "course_change";
+  applicationChannel?: "consultancy" | "direct" | "agent" | "online_portal" | "walk_in";
+  applicationDate: string;
+  priority?: "low" | "medium" | "high" | "urgent";
+  status?: "new" | "in_progress" | "documents_pending" | "ready_to_submit" | "submitted" | "offer_received" | "offer_accepted" | "rejected" | "withdrawn" | "visa";
+  
+  // Staff Assignment
+  assignedStaffId?: string | null;
+  applicationOfficerId?: string | null;
+  visaOfficerId?: string | null;
+  submittedById?: string | null;
+  
+  // Academic Information
+  highestQualification?: string | null;
+  institution?: string | null;
+  graduationYear?: string | null;
+  gpa?: number | null;
+  percentage?: number | null;
+  
+  // English Test Information
+  englishTest?: string | null;
+  englishTestOverallScore?: number | null;
+  englishTestDate?: string | null;
+  englishTestScores?: {
+    listening?: number;
+    reading?: number;
+    writing?: number;
+    speaking?: number;
+  };
+  
+  // Submission Information
+  submissionDate?: string | null;
+  universityReferenceNumber?: string | null;
+  submissionMethod?: "university_portal" | "email" | "consultancy_portal" | "courier" | "agent_submission" | "online_system";
+  portalId?: string | null;
+  
+  // Notes & Additional
+  notes?: string | null;
+  internalNotes?: string | null;
+  metadata?: any;
+  
+  // Multi-tenancy
+  organizationId?: string;
+  
+  // Timestamps
+  createdAt?: string;
+  updatedAt?: string;
+  
+  // Relations
+  student?: {
+    id: string;
+    fullName: string;
+    email: string;
+    phone?: string;
+    country?: string;
+    nationality?: string;
+    dateOfBirth?: string;
+  };
+  university?: {
+    id: string;
+    name: string;
+    country?: string;
+    city?: string;
+    logoUrl?: string;
+  };
+  campus?: {
+    id: string;
+    name: string;
+    city?: string;
+    campusType?: string;
+  };
+  course?: {
+    id: string;
+    name: string;
+    code?: string;
+    level?: string;
+    mode?: string;
+    duration?: string;
+  };
+  intake?: {
+    id: string;
+    label?: string;
+    month?: string;
+    year?: number;
+    status?: string;
+    courseStartDate?: string;
+  };
+  assignedStaff?: {
+    id: string;
+    fullName: string;
+    email: string;
+    role?: string;
+    employeeCode?: string;
+  };
+  applicationOfficer?: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+  visaOfficer?: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+  submittedBy?: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+}
+
+export async function getAllApplications(params?: {
+  status?: string;
+  studentId?: string;
+  universityId?: string;
+  courseId?: string;
+  assignedStaffId?: string;
+  priority?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<ApiResponse<Application[]>> {
+  const q = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        q.append(key, String(value));
+      }
+    });
+  }
+  const res = await fetch(`${API_BASE}/api/applications?${q}`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function getApplicationDashboard(): Promise<ApiResponse<any>> {
+  const res = await fetch(`${API_BASE}/api/applications/dashboard`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function getApplicationById(id: string): Promise<ApiResponse<Application>> {
+  const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  const json = await res.json();
+  // Backend wraps the application in a nested object
+  if (json.success && json.data?.application) {
+    return { ...json, data: json.data.application };
+  }
+  return json;
+}
+
+export async function createApplication(data: Partial<Application>): Promise<ApiResponse<Application>> {
+  const res = await fetch(`${API_BASE}/api/applications`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function updateApplication(id: string, data: Partial<Application>): Promise<ApiResponse<Application>> {
+  const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function deleteApplication(id: string): Promise<ApiResponse<void>> {
+  const res = await fetch(`${API_BASE}/api/applications/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function updateApplicationStatus(id: string, status: string, notes?: string): Promise<ApiResponse<Application>> {
+  const res = await fetch(`${API_BASE}/api/applications/${id}/status`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status, notes }),
+  });
+  return res.json();
+}
+
+export async function submitApplication(id: string, data: {
+  submissionMethod?: string;
+  universityReferenceNumber?: string;
+  portalId?: string;
+  notes?: string;
+}): Promise<ApiResponse<Application>> {
+  const res = await fetch(`${API_BASE}/api/applications/${id}/submit`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function withdrawApplication(id: string, reason: string): Promise<ApiResponse<Application>> {
+  const res = await fetch(`${API_BASE}/api/applications/${id}/withdraw`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ reason }),
+  });
+  return res.json();
+}
+
+// Application Documents - See APPLICATION DOCUMENTS section below for full API
+
+// Application Offers
+export async function getApplicationOffers(applicationId: string): Promise<ApiResponse<any[]>> {
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/offers`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function getAllApplicationOffers(params?: {
+  applicationId?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}): Promise<ApiResponse<any[]>> {
+  const q = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") q.append(key, String(value));
+    });
+  }
+  const res = await fetch(`${API_BASE}/api/applications/offers/all?${q}`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function createApplicationOffer(data: any): Promise<ApiResponse<any>> {
+  const res = await fetch(`${API_BASE}/api/applications/offers`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function acceptApplicationOffer(offerId: string, data?: any): Promise<ApiResponse<any>> {
+  const res = await fetch(`${API_BASE}/api/applications/offers/${offerId}/accept`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data || {}),
+  });
+  return res.json();
+}
+
+export async function declineApplicationOffer(offerId: string, data?: any): Promise<ApiResponse<any>> {
+  const res = await fetch(`${API_BASE}/api/applications/offers/${offerId}/decline`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data || {}),
+  });
+  return res.json();
+}
+
+// Application Notes
+export async function getApplicationNotes(applicationId: string): Promise<ApiResponse<any[]>> {
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/notes`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+export async function addApplicationNote(applicationId: string, data: { note: string; isInternal?: boolean }): Promise<ApiResponse<any>> {
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/notes`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+// Application Activity Log
+export async function getApplicationActivity(applicationId: string): Promise<ApiResponse<any[]>> {
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/activity`, {
+    headers: getAuthHeaders(),
+  });
+  return res.json();
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR API REQUESTS
+// ==========================================
+
+function buildQuery(params?: Record<string, any>): string {
+  if (!params) return "";
+  const q = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      q.append(key, String(value));
+    }
+  });
+  const queryString = q.toString();
+  return queryString ? `?${queryString}` : "";
+}
+
+async function apiRequest(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<any>> {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers: {
+      ...getAuthHeaders(),
+      ...options.headers,
+    },
+  });
+  return res.json();
+}
+
+// ==========================================
+// APPLICATION DOCUMENTS
+// ==========================================
+export interface ApplicationDocument {
+  id: string;
+  applicationId: string;
+  documentType: string;
+  documentName: string;
+  description?: string | null;
+  isRequired: boolean;
+  isUploaded: boolean;
+  isVerified: boolean;
+  fileName?: string | null;
+  fileUrl?: string | null;
+  fileType?: string | null;
+  fileSize?: number | null;
+  status: string;
+  uploadedById?: string | null;
+  uploadedAt?: string | null;
+  verifiedById?: string | null;
+  verifiedAt?: string | null;
+  notes?: string | null;
+  rejectionReason?: string | null;
+  verificationNotes?: string | null;
+  expiryDate?: string | null;
+  issueDate?: string | null;
+  version?: number;
+  previousVersionId?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  // Relations
+  application?: {
+    id: string;
+    applicationNumber: string;
+    studentId?: string;
+    status?: string;
+  };
+  uploadedBy?: { id: string; fullName: string; email: string };
+  verifiedBy?: { id: string; fullName: string; email: string };
+}
+
+export async function getAllApplicationDocuments(params?: Record<string, any>) {
+  return apiRequest(`/api/applications/documents/all${buildQuery(params)}`);
+}
+
+export async function getApplicationDocumentById(id: string) {
+  return apiRequest(`/api/applications/documents/${id}`);
+}
+
+export async function createApplicationDocument(data: Partial<ApplicationDocument>) {
+  return apiRequest(`/api/applications/documents`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateApplicationDocument(id: string, data: Partial<ApplicationDocument>) {
+  return apiRequest(`/api/applications/documents/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function verifyApplicationDocument(
+  id: string,
+  data: { verified: boolean; verificationNotes?: string; rejectionReason?: string }
+) {
+  return apiRequest(`/api/applications/documents/${id}/verify`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteApplicationDocument(id: string) {
+  return apiRequest(`/api/applications/documents/${id}`, { method: "DELETE" });
+}
+
+export async function getApplicationDocumentStats(applicationId: string) {
+  return apiRequest(`/api/applications/documents/stats/${applicationId}`);
+}
+
+export async function bulkUploadApplicationDocuments(documents: Partial<ApplicationDocument>[]): Promise<ApiResponse<any>> {
+  return apiRequest(`/api/applications/documents/bulk-upload`, {
+    method: "POST",
+    body: JSON.stringify({ documents }),
+  });
 }

@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   BookOpen, Plus, Search, Eye, Edit, Trash2,
-  GraduationCap, DollarSign, Clock, Star,
-  CheckCircle, XCircle, Award, Globe, Filter,
+  GraduationCap, Clock, Star,
+  CheckCircle, XCircle, Award,
 } from "lucide-react";
 import {
   getAllCourses, getAllUniversities, getAllCampuses,
@@ -532,99 +532,90 @@ export default function CoursesPage() {
     }
   }
 
+  const stats = {
+    total: courses.length,
+    active: courses.filter((c) => c.isActive).length,
+    featured: courses.filter((c) => c.isFeatured).length,
+    withScholarship: courses.filter((c) => c.isScholarshipAvailable).length,
+  };
+
   return (
     <AdminLayout>
-      <div className="p-6 space-y-5 max-w-[1800px] mx-auto">
+      <div className="p-6 space-y-5 max-w-7xl mx-auto">
+
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {filtered.length} {filtered.length === 1 ? "course" : "courses"} found
-            </p>
+            <p className="text-sm text-gray-500 mt-0.5">Manage all university courses</p>
           </div>
           <Button className="bg-[#1e3a8a] hover:bg-[#1e40af]" onClick={() => setShowCreate(true)}>
             <Plus className="w-4 h-4 mr-2" /> Add Course
           </Button>
         </div>
 
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: "Total Courses",     value: stats.total,           icon: BookOpen,      color: "from-blue-500 to-blue-600" },
+            { label: "Active",            value: stats.active,          icon: CheckCircle,   color: "from-green-500 to-green-600" },
+            { label: "Featured",          value: stats.featured,        icon: Star,          color: "from-yellow-500 to-yellow-600" },
+            { label: "With Scholarship",  value: stats.withScholarship, icon: Award,         color: "from-purple-500 to-purple-600" },
+          ].map((s) => {
+            const Icon = s.icon;
+            return (
+              <Card key={s.label} className="p-4 overflow-hidden relative">
+                <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${s.color} opacity-10 rounded-bl-full`} />
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center mb-3`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                <p className="text-xs text-gray-500 font-medium">{s.label}</p>
+              </Card>
+            );
+          })}
+        </div>
+
         {/* Filters */}
         <Card className="p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <Filter className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-semibold text-gray-700">Filters</span>
-          </div>
           <div className="flex flex-wrap gap-3">
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search courses..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20"
-                />
-              </div>
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input type="text" placeholder="Search by name or code..." value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20" />
             </div>
-            <select
-              value={uniFilter}
-              onChange={(e) => setUniFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20"
-            >
+            <select value={uniFilter} onChange={(e) => setUniFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20">
               <option value="">All Universities</option>
-              {universities.map((u) => (
-                <option key={u.id} value={u.id}>{u.name}</option>
-              ))}
+              {universities.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
             </select>
-            <select
-              value={levelFilter}
-              onChange={(e) => setLevelFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20"
-            >
+            <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20">
               <option value="">All Levels</option>
-              {Object.entries(LEVEL_CONFIG).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
+              {Object.entries(LEVEL_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
             </select>
-            <select
-              value={modeFilter}
-              onChange={(e) => setModeFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20"
-            >
+            <select value={modeFilter} onChange={(e) => setModeFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20">
               <option value="">All Modes</option>
-              {Object.entries(MODE_CONFIG).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
+              {Object.entries(MODE_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
             </select>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20"
-            >
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20">
               <option value="">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
             {(search || uniFilter || levelFilter || modeFilter || statusFilter) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSearch("");
-                  setUniFilter("");
-                  setLevelFilter("");
-                  setModeFilter("");
-                  setStatusFilter("");
-                }}
-              >
+              <Button variant="outline" size="sm"
+                onClick={() => { setSearch(""); setUniFilter(""); setLevelFilter(""); setModeFilter(""); setStatusFilter(""); }}>
                 Clear
               </Button>
             )}
           </div>
         </Card>
 
-        {/* Content */}
+        {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-4 border-[#1e3a8a] border-t-transparent rounded-full animate-spin" />
@@ -633,123 +624,150 @@ export default function CoursesPage() {
           <Card className="py-20 text-center">
             <BookOpen className="w-16 h-16 text-gray-200 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              {search || uniFilter || levelFilter || modeFilter || statusFilter
-                ? "No courses match your filters"
-                : "No courses yet"}
+              {search || uniFilter || levelFilter || modeFilter || statusFilter ? "No courses match your filters" : "No courses yet"}
             </h3>
             <p className="text-sm text-gray-500 mb-4">
-              {search || uniFilter || levelFilter || modeFilter || statusFilter
-                ? "Try adjusting your search."
-                : "Add your first course to get started."}
+              {search || uniFilter || levelFilter || modeFilter || statusFilter ? "Try adjusting your search." : "Add your first course to get started."}
             </p>
+            {!search && !uniFilter && !levelFilter && !modeFilter && !statusFilter && (
+              <Button onClick={() => setShowCreate(true)} className="bg-[#1e3a8a] hover:bg-[#1e40af]">
+                <Plus className="w-4 h-4 mr-2" /> Add Course
+              </Button>
+            )}
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filtered.map((course) => {
-              const levelConf = LEVEL_CONFIG[course.level] || { label: course.level, color: "bg-gray-100 text-gray-700" };
-              const modeConf = MODE_CONFIG[course.mode] || { label: course.mode, color: "bg-gray-100 text-gray-700" };
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Course</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">University</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Level</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Mode</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Duration</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-600 whitespace-nowrap">Tuition Fee</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-600 whitespace-nowrap">IELTS</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-600 whitespace-nowrap">Featured</th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-600 whitespace-nowrap">Status</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-600 whitespace-nowrap">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((course, idx) => {
+                    const levelConf = LEVEL_CONFIG[course.level] || { label: course.level, color: "bg-gray-100 text-gray-700" };
+                    const modeConf  = MODE_CONFIG[course.mode]   || { label: course.mode,  color: "bg-gray-100 text-gray-700" };
+                    return (
+                      <tr key={course.id}
+                        className={`border-b border-gray-100 hover:bg-blue-50/40 transition-colors ${idx % 2 === 1 ? "bg-gray-50/50" : ""}`}>
 
-              return (
-                <Card key={course.id} className="overflow-hidden hover:shadow-md transition-shadow group">
-                  {course.coverImageUrl ? (
-                    <div className="h-32 w-full overflow-hidden">
-                      <img src={course.coverImageUrl} alt={course.name} className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="h-32 w-full bg-gradient-to-br from-[#1e3a8a] to-[#1e40af] flex items-center justify-center">
-                      <BookOpen className="w-10 h-10 text-white/50" />
-                    </div>
-                  )}
+                        {/* Course Name */}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#1e3a8a] to-[#1e40af] flex items-center justify-center flex-shrink-0">
+                              <BookOpen className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-gray-900 max-w-[200px] truncate">{course.name}</div>
+                              <div className="text-xs text-gray-500">{course.code}</div>
+                            </div>
+                          </div>
+                        </td>
 
-                  <div className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm leading-tight">{course.name}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{course.code}</p>
-                      </div>
-                      {course.isActive ? (
-                        <Badge className="bg-green-100 text-green-700 text-xs flex-shrink-0 ml-2">
-                          <CheckCircle className="w-3 h-3 mr-1" /> Active
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-gray-100 text-gray-600 text-xs flex-shrink-0 ml-2">
-                          <XCircle className="w-3 h-3 mr-1" /> Inactive
-                        </Badge>
-                      )}
-                    </div>
+                        {/* University */}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="text-gray-700 max-w-[160px] truncate block">{(course as any).university?.name || "—"}</span>
+                        </td>
 
-                    {course.shortDescription && (
-                      <p className="text-xs text-gray-600 mb-3 line-clamp-2">{course.shortDescription}</p>
-                    )}
+                        {/* Level */}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <Badge variant="secondary" className={`text-xs ${levelConf.color}`}>{levelConf.label}</Badge>
+                        </td>
 
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge className={`${levelConf.color} text-xs`}>{levelConf.label}</Badge>
-                      <Badge className={`${modeConf.color} text-xs`}>{modeConf.label}</Badge>
-                      {course.isFeatured && (
-                        <Badge className="bg-yellow-100 text-yellow-700 text-xs">
-                          <Star className="w-3 h-3" />
-                        </Badge>
-                      )}
-                    </div>
+                        {/* Mode */}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <Badge variant="secondary" className={`text-xs ${modeConf.color}`}>{modeConf.label}</Badge>
+                        </td>
 
-                    <div className="grid grid-cols-2 gap-2 py-2 border-t border-gray-100 mb-3 text-xs">
-                      {course.tuitionFee && (
-                        <div className="flex items-center gap-1.5">
-                          <DollarSign className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-gray-600">{course.currency || "$"}{course.tuitionFee.toLocaleString()}</span>
-                        </div>
-                      )}
-                      {course.duration && (
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-gray-600">{course.duration}</span>
-                        </div>
-                      )}
-                      {course.ieltsOverall && (
-                        <div className="flex items-center gap-1.5">
-                          <Globe className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-gray-600">IELTS {course.ieltsOverall}</span>
-                        </div>
-                      )}
-                      {course.isScholarshipAvailable && (
-                        <div className="flex items-center gap-1.5">
-                          <Award className="w-3.5 h-3.5 text-yellow-500" />
-                          <span className="text-gray-600">Scholarship</span>
-                        </div>
-                      )}
-                    </div>
+                        {/* Duration */}
+                        <td className="px-4 py-3 whitespace-nowrap text-gray-700">
+                          {course.duration ? (
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5 text-gray-400" />
+                              {course.duration}
+                            </div>
+                          ) : course.durationMonths ? (
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5 text-gray-400" />
+                              {course.durationMonths}m
+                            </div>
+                          ) : "—"}
+                        </td>
 
-                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-xs"
-                        onClick={() => router.push(`/admin/courses/${course.id}`)}
-                      >
-                        <Eye className="w-3.5 h-3.5 mr-1" /> View
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-xs"
-                        onClick={() => { setSelected(course); setShowEdit(true); }}
-                      >
-                        <Edit className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-500 hover:text-red-600 hover:border-red-300 hover:bg-red-50"
-                        onClick={() => { setSelected(course); setShowDelete(true); }}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
+                        {/* Tuition Fee */}
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          {course.tuitionFee ? (
+                            <div>
+                              <div className="font-semibold text-gray-900">{course.currency} {Number(course.tuitionFee).toLocaleString()}</div>
+                              {course.feeFrequency && <div className="text-xs text-gray-400 capitalize">{course.feeFrequency.replace(/_/g, " ")}</div>}
+                            </div>
+                          ) : <span className="text-gray-300">—</span>}
+                        </td>
+
+                        {/* IELTS */}
+                        <td className="px-4 py-3 text-center whitespace-nowrap">
+                          {course.ieltsOverall ? (
+                            <span className="font-bold text-gray-900">{course.ieltsOverall}</span>
+                          ) : <span className="text-gray-300">—</span>}
+                        </td>
+
+                        {/* Featured */}
+                        <td className="px-4 py-3 text-center whitespace-nowrap">
+                          {course.isFeatured
+                            ? <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 mx-auto" />
+                            : <span className="text-gray-300">—</span>}
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-4 py-3 text-center whitespace-nowrap">
+                          {course.isActive ? (
+                            <Badge className="bg-green-100 text-green-700 text-xs inline-flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" /> Active
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-gray-100 text-gray-600 text-xs inline-flex items-center gap-1">
+                              <XCircle className="w-3 h-3" /> Inactive
+                            </Badge>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-4 py-3 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button variant="outline" size="sm" onClick={() => router.push(`/admin/courses/${course.id}`)}>
+                              <Eye className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button variant="outline" size="sm"
+                              onClick={() => { setSelected(course); setShowEdit(true); }}>
+                              <Edit className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button variant="outline" size="sm"
+                              onClick={() => { setSelected(course); setShowDelete(true); }}
+                              className="text-red-600 hover:text-red-700 hover:border-red-300">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 text-xs text-gray-500">
+              Showing {filtered.length} of {courses.length} courses
+            </div>
+          </Card>
         )}
       </div>
 
